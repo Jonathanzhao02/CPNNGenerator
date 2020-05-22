@@ -62,7 +62,7 @@ public class Genome{
     public void generateNode(){
 
         if(genome.size() > 0){
-            Gene gene = genome.get(RANDOM.nextInt(genome.size()));
+            Gene gene = (Gene) genome.values().toArray()[RANDOM.nextInt(genome.size())];
 
             int newNode = network.size();
             int innovationNumber1 = checkMutation(gene.getInput(), newNode);

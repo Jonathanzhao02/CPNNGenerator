@@ -5,22 +5,39 @@ import java.awt.GridLayout;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.imageio.ImageIO;
+
+import java.awt.Component;
+import java.awt.image.BufferedImage;
 
 import java.util.HashMap;
+import java.io.File;
 
 public class Main{
 	static final int size = 1000;
-	static final int numTiles = 100;
+	static final int numTiles = 200;
+	static JFrame frame;
+
+	// ripped from stackoverflow
+	public static BufferedImage getScreenShot(Component component) {
+		BufferedImage image = new BufferedImage(component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_RGB);
+		component.paint(image.getGraphics());
+		return image;
+	}
 
 	public static void main(String[] args){
-		JFrame frame = new JFrame("Canvas");
-		frame.getContentPane().setLayout(new GridLayout(numTiles, numTiles));
+		frame = new JFrame("Canvas");
 		frame.setSize(size, size);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		frame.getContentPane().setLayout(new GridLayout(numTiles, numTiles));
 
 		Genome test = new Genome(new HashMap<Integer, Gene>(), 2, 3);
 		test.compile();
 		
-		for(int i = 0; i < 200; i++){
+		for(int i = 0; i < 100; i++){
 
 			if(Math.random() >= 0.5){
 				test.generateLink();
@@ -82,8 +99,15 @@ public class Main{
 		}
 
 		frame.validate();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		BufferedImage img = getScreenShot(frame.getContentPane());
+
+		try{
+			ImageIO.write(img, "png", new File("screenshot" + k + ".png"));
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+
 	}
 	
 }
