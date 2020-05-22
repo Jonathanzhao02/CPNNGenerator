@@ -1,7 +1,8 @@
 import java.util.function.Function;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -56,7 +57,8 @@ public class Node implements Serializable{
 
     private NodeType type;
     private ActivationFunction func = ActivationFunction.LINEAR;
-    private HashMap<Node, Gene> inputs = new HashMap<Node, Gene>();
+    private LinkedHashMap<Node, Gene> outputs = new LinkedHashMap<Node, Gene>();
+    private ArrayList<Node> inputs = new ArrayList<Node>();
     private boolean fired = false;
     private double output = 0;
 
@@ -83,8 +85,16 @@ public class Node implements Serializable{
         this.func = func;
     }
 
-    public void addInput(Node node, Gene gene){
-        inputs.put(node, gene);
+    public void addInput(Node node){
+        inputs.add(node);
+    }
+
+    public void addOutput(Node node, Gene gene){
+        outputs.put(node, gene);
+    }
+
+    public Gene getGene(Node node){
+        return outputs.get(node);
     }
 
     public double getOutput(){
@@ -92,8 +102,8 @@ public class Node implements Serializable{
         double rawOutput = 0;
         fired = true;
 
-        for(Node node : inputs.keySet()){
-            rawOutput += inputs.get(node).invoke(node.getOutput());
+        for(Node node : inputs){
+            rawOutput += node.getGene(this).invoke(node.getOutput());
         }
 
         output = func.invoke(rawOutput);
@@ -167,10 +177,12 @@ public class Node implements Serializable{
 
     private static double inverse(double x){
 
-        if(x != 0){
-            return 1.0 / x;
-        } else{
+        if(x > 0){
+            return 1.0 / (x + 1);
+        } else if(x == 0){
             return 0;
+        } else{
+            return 1.0 / (x - 1);
         }
 
     }
@@ -196,7 +208,7 @@ public class Node implements Serializable{
     }
 
     private static double exponential(double x){
-        return Math.pow(10, x - 1);
+        return Math.pow(2, x - 1);
     }
 
     private static double alternatingFloor(double x){

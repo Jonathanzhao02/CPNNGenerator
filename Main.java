@@ -14,7 +14,9 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Main{
@@ -29,6 +31,7 @@ public class Main{
 	static boolean animate = false;
 	static boolean minimized = false;
 	static String fileName = "pattern";
+	static String loadFile = null;
 
 	// ripped from stackoverflow
 	public static BufferedImage getScreenShot(Component component){
@@ -46,6 +49,7 @@ public class Main{
 		System.out.println("ANIM: If rendering should be animated (true/false)");
 		System.out.println("MIN: If window should never pop up (true/false)");
 		System.out.println("FILE: Screenshot and network file names (string)");
+		System.out.println("LOAD: Load network file name without extension (string)");
 		ArrayList<String> args = new ArrayList<String>(Arrays.asList(rArgs));
 		args.ensureCapacity(6);
 		args.forEach(obj -> {
@@ -107,6 +111,15 @@ public class Main{
 					fileName = "pattern";
 				}
 
+			} else if(str.contains("LOAD=")){
+
+				try{
+					loadFile = str.substring(5, str.length());
+				} catch(Exception e){
+					System.out.println("Could not read LOAD");
+					loadFile = null;
+				}
+
 			}
 
 		});
@@ -125,18 +138,37 @@ public class Main{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(numTiles, numTiles));
 
-		Genome test = new Genome(new HashMap<Integer, Gene>(), 2, 3);
-		test.compile();
-		
-		for(int i = 0; i < DEF_COMPLEXITY; i++){
+		Genome test = null;
 
-			if(Math.random() >= 0.5){
-				test.generateLink();
-			} else{
-				test.generateNode();
+		if(loadFile != null){
+
+			try{
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream("patterns/" + loadFile + ".gen"));
+				test = (Genome) ois.readObject();
+				System.out.println("Loaded genome");
+				ois.close();
+			} catch(Exception e){
+				e.printStackTrace();
+				test = null;
 			}
 
+		}
+
+		if(test == null){
+			test = new Genome(new HashMap<Integer, Gene>(), 2, 3);
 			test.compile();
+			
+			for(int i = 0; i < DEF_COMPLEXITY; i++){
+
+				if(Math.random() >= 0.5){
+					test.generateLink();
+				} else{
+					test.generateNode();
+				}
+
+				test.compile();
+			}
+
 		}
 
 		double maxValR = Double.MIN_VALUE;

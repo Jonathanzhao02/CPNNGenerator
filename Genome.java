@@ -71,14 +71,27 @@ public class Genome implements Serializable{
             int innovationNumber1 = checkMutation(gene.getInput(), newNode);
             int innovationNumber2 = checkMutation(newNode, gene.getOutput());
 
-            if(innovationNumber1 == GLOBAL_INNOVATION_NUMBER && innovationNumber2 == GLOBAL_INNOVATION_NUMBER){
-                Gene newGene1 = new Gene(gene.getInput(), newNode, 1, GLOBAL_INNOVATION_NUMBER, Node.ActivationFunction.random());
-                Gene newGene2 = new Gene(newNode, gene.getOutput(), gene.getWeight(), GLOBAL_INNOVATION_NUMBER + 1, gene.getActivationFunction());
-                genome.put(GLOBAL_INNOVATION_NUMBER, newGene1);
-                genome.put(GLOBAL_INNOVATION_NUMBER + 1, newGene2);
-                GLOBAL_INNOVATION_NUMBER += 2;
-                MUTATIONS.add(newGene1);
-                MUTATIONS.add(newGene2);
+            if(!checkExistence(gene.getInput(), newNode) && !checkExistence(newNode, gene.getOutput())){
+
+                if(innovationNumber1 == GLOBAL_INNOVATION_NUMBER && innovationNumber2 == GLOBAL_INNOVATION_NUMBER){
+                    innovationNumber2 += 1;
+                }
+
+                Gene newGene1 = new Gene(gene.getInput(), newNode, 1, innovationNumber1, Node.ActivationFunction.random());
+                Gene newGene2 = new Gene(newNode, gene.getOutput(), gene.getWeight(), innovationNumber2, gene.getActivationFunction());
+
+                if(innovationNumber1 == GLOBAL_INNOVATION_NUMBER){
+                    genome.put(innovationNumber1, newGene1);
+                    GLOBAL_INNOVATION_NUMBER += 1;
+                    MUTATIONS.add(newGene1);
+                }
+
+                if(innovationNumber2 == GLOBAL_INNOVATION_NUMBER){
+                    genome.put(innovationNumber2, newGene2);
+                    GLOBAL_INNOVATION_NUMBER += 1;
+                    MUTATIONS.add(newGene2);
+                }
+
                 gene.enabled = false;
                 // System.out.println("Split link between " + gene.getInput() + " and " + gene.getOutput() + " with " + newNode);
             }
@@ -87,7 +100,7 @@ public class Genome implements Serializable{
 
     }
 
-    public int checkMutation(int input, int output){
+    public static int checkMutation(int input, int output){
 
         for(Gene gene : MUTATIONS){
 
@@ -100,17 +113,18 @@ public class Genome implements Serializable{
         return GLOBAL_INNOVATION_NUMBER;
     }
 
-    public Gene checkExistence(int input, int output){
+    public boolean checkExistence(int input, int output){
 
-        for(Gene gene : genome.values()){
+        for(int i = 0; i < GLOBAL_INNOVATION_NUMBER; i++){
+            Gene gene = genome.get(i);
 
-            if(gene.getInput() == input && gene.getOutput() == output){
-                return gene;
+            if(gene != null && gene.getInput() == input && gene.getOutput() == output){
+                return true;
             }
 
         }
 
-        return null;
+        return false;
     }
 
     public HashMap<Integer, Gene> getGenome(){return genome;}
@@ -141,26 +155,30 @@ public class Genome implements Serializable{
         }
 
         // connection + hidden node generation
-        for(Gene gene : genome.values()){
+        for(int i = 0; i < GLOBAL_INNOVATION_NUMBER; i++){
+            Gene gene = genome.get(i);
 
-            if(network.get(gene.getOutput()) == null && gene.enabled){
+            if(gene != null && network.get(gene.getOutput()) == null && gene.enabled){
                 network.put(gene.getOutput(), new Node(Node.NodeType.HIDDEN, gene.getActivationFunction()));
             }
 
         }
 
-        for(Gene gene : genome.values()){
+        for(int i = 0; i < GLOBAL_INNOVATION_NUMBER; i++){
+            Gene gene = genome.get(i);
 
-            if(network.get(gene.getInput()) == null && gene.enabled){
+            if(gene != null && network.get(gene.getInput()) == null && gene.enabled){
                 network.put(gene.getInput(), new Node(Node.NodeType.HIDDEN));
             }
 
         }
 
-        for(Gene gene : genome.values()){
+        for(int i = 0; i < GLOBAL_INNOVATION_NUMBER; i++){
+            Gene gene = genome.get(i);
 
-            if(gene.enabled){
-                network.get(gene.getOutput()).addInput(network.get(gene.getInput()), gene);
+            if(gene != null && gene.enabled){
+                network.get(gene.getOutput()).addInput(network.get(gene.getInput()));
+                network.get(gene.getInput()).addOutput(network.get(gene.getOutput()), gene);
             }
 
         }
