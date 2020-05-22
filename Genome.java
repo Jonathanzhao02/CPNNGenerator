@@ -1,8 +1,11 @@
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
-public class Genome{
+public class Genome implements Serializable{
+    static final long serialVersionUID = Long.parseLong("52120201109");
+
     private static int GLOBAL_INNOVATION_NUMBER = 0;
     private static HashSet<Gene> MUTATIONS = new HashSet<Gene>();
     private static final Random RANDOM = new Random();

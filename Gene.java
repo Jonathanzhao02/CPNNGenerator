@@ -1,6 +1,9 @@
+import java.io.Serializable;
 import java.util.Random;
 
-public class Gene{
+public class Gene implements Serializable{
+    static final long serialVersionUID = Long.parseLong("52120201110");
+
     private static final Random RANDOM = new Random();
     private int input;
     private int output;

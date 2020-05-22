@@ -5,7 +5,6 @@ import java.awt.GridLayout;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.imageio.ImageIO;
 
 import java.awt.Component;
@@ -13,6 +12,8 @@ import java.awt.image.BufferedImage;
 
 import java.util.HashMap;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 public class Main{
 	static final int size = 1000;
@@ -20,13 +21,16 @@ public class Main{
 	static JFrame frame;
 
 	// ripped from stackoverflow
-	public static BufferedImage getScreenShot(Component component) {
+	public static BufferedImage getScreenShot(Component component){
 		BufferedImage image = new BufferedImage(component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_RGB);
 		component.paint(image.getGraphics());
 		return image;
 	}
 
 	public static void main(String[] args){
+		System.out.println("If you want it to save, run with args:");
+		System.out.println("Arg 0: suffix of file name");
+		System.out.println("Arg 1: any input will make it quit upon saving (so no visualization of the pattern)");
 		frame = new JFrame("Canvas");
 		frame.setSize(size, size);
 		frame.setVisible(true);
@@ -100,12 +104,23 @@ public class Main{
 
 		frame.validate();
 
-		BufferedImage img = getScreenShot(frame.getContentPane());
+		if(args.length > 0){
 
-		try{
-			ImageIO.write(img, "png", new File("screenshot.png"));
-		} catch(Exception e){
-			e.printStackTrace();
+			BufferedImage img = getScreenShot(frame.getContentPane());
+
+			try{
+				ImageIO.write(img, "png", new File("patterns/screenshot" + args[0] + ".png"));
+				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("patterns/network" + args[0] + ".gen"));
+				oos.writeObject(test);
+				oos.close();
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+
+			if(args.length > 1){
+				System.exit(0);
+			}
+
 		}
 
 	}

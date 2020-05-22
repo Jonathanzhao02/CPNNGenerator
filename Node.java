@@ -1,10 +1,13 @@
 import java.util.function.Function;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class Node{
+public class Node implements Serializable{
+    static final long serialVersionUID = Long.parseLong("52120201111");
+
     public enum ActivationFunction{
         GAUSSIAN(Node::gaussian),
         SINE(Node::sine),
