@@ -2,6 +2,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Arrays;
 
 public class Genome implements Serializable{
     static final long serialVersionUID = Long.parseLong("52120201109");
@@ -51,12 +52,15 @@ public class Genome implements Serializable{
     }
 
     public void mutateActivation(){
+        if(genome.size() <= 0) return;
+
         double activationChance = ACTIVATION_MUTATION_RATE;
 
-        for(Gene gene : genome.values()){
+        while(activationChance > 0){
 
             if(RANDOM.nextDouble() < activationChance){
-                gene.mutateActivation();
+                Gene randomGene = (Gene) (genome.values().toArray()[RANDOM.nextInt(genome.size())]);
+                randomGene.mutateActivation();
             }
 
             activationChance -= 1;
