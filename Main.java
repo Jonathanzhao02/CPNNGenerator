@@ -103,7 +103,7 @@ public class Main{
 		BufferedImage img = getScreenShot(frame.getContentPane());
 
 		try{
-			ImageIO.write(img, "png", new File("screenshot" + k + ".png"));
+			ImageIO.write(img, "png", new File("screenshot.png"));
 		} catch(Exception e){
 			e.printStackTrace();
 		}
