@@ -33,6 +33,11 @@ public class Main{
 		System.out.println("Arg 1: any input will make it quit upon saving (so no visualization of the pattern)");
 		frame = new JFrame("Canvas");
 		frame.setSize(size, size);
+
+		if(args.length > 1){
+			frame.setState(frame.ICONIFIED);
+		}
+
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
