@@ -15,6 +15,7 @@ public class Node implements Serializable{
         COSINE(Node::cosine),
         TANH(Node::tanh),
         SIGMOID(Node::sigmoid),
+        BOUNDED_LINEAR(Node::boundedLinear),
         RELU(Node::relu),
         MODULUS(Node::modulus),
         INVERSE_MODULUS(Node::inverseModulus),
@@ -153,6 +154,18 @@ public class Node implements Serializable{
 
     private static double sigmoid(double x){
         return 2.0 / (1.0 + Math.pow(Math.E, -x)) - 1.0;
+    }
+
+    private static double boundedLinear(double x){
+
+        if(x > 1){
+            return 1;
+        } else if(x < -1){
+            return -1;
+        } else{
+            return x;
+        }
+
     }
 
     private static double relu(double x){

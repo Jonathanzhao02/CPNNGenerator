@@ -32,11 +32,11 @@ public class Gene implements Serializable{
         return x * weight;
     }
 
-    public void perturbeWeight(double x){
+    public void mutateWeight(double x){
         weight += x;
     }
 
-    public void perturbeActivation(){
+    public void mutateActivation(){
         func = Node.ActivationFunction.random();
     }
 

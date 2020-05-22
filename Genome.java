@@ -9,6 +9,11 @@ public class Genome implements Serializable{
     private static int GLOBAL_INNOVATION_NUMBER = 0;
     private static HashSet<Gene> MUTATIONS = new HashSet<Gene>();
     private static final Random RANDOM = new Random();
+
+    private static double PERTURB_CHANCE = 0.8;
+    private static double PERTURB_MAGNITUDE = 0.05;
+    private static double ACTIVATION_MUTATION_RATE = 2.5;
+
     private HashMap<Integer, Node> network = new HashMap<Integer, Node>();
     private HashMap<Integer, Gene> genome = new HashMap<Integer, Gene>();
 
@@ -31,6 +36,32 @@ public class Genome implements Serializable{
 
     public void addGene(Gene gene){
         genome.put(gene.getInnovationNumber(), gene);
+    }
+
+    public void mutateWeights(){
+
+        for(Gene gene : genome.values()){
+
+            if(RANDOM.nextDouble() < PERTURB_CHANCE){
+                gene.mutateWeight(RANDOM.nextGaussian() * PERTURB_MAGNITUDE);
+            }
+
+        }
+
+    }
+
+    public void mutateActivation(){
+        double activationChance = ACTIVATION_MUTATION_RATE;
+
+        for(Gene gene : genome.values()){
+
+            if(RANDOM.nextDouble() < activationChance){
+                gene.mutateActivation();
+            }
+
+            activationChance -= 1;
+        }
+
     }
 
     public void generateLink(){
@@ -77,7 +108,7 @@ public class Genome implements Serializable{
                     innovationNumber2 += 1;
                 }
 
-                Gene newGene1 = new Gene(gene.getInput(), newNode, 1, innovationNumber1, Node.ActivationFunction.random());
+                Gene newGene1 = new Gene(gene.getInput(), newNode, 1, innovationNumber1, Node.ActivationFunction.LINEAR);
                 Gene newGene2 = new Gene(newNode, gene.getOutput(), gene.getWeight(), innovationNumber2, gene.getActivationFunction());
 
                 if(innovationNumber1 == GLOBAL_INNOVATION_NUMBER){

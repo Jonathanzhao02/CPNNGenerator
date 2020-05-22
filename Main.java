@@ -166,6 +166,9 @@ public class Main{
 					test.generateNode();
 				}
 
+				test.mutateWeights();
+				test.mutateActivation();
+
 				test.compile();
 			}
 
