@@ -40,6 +40,7 @@ public class Gene implements Serializable{
         func = Node.ActivationFunction.random();
     }
 
+    public void setActivationFunction(Node.ActivationFunction func){this.func = func;}
     public Node.ActivationFunction getActivationFunction(){return func;}
     public int getInnovationNumber(){return innovationNumber;}
     public int getInput(){return input;}

@@ -2,7 +2,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Arrays;
 
 public class Genome implements Serializable{
     static final long serialVersionUID = Long.parseLong("52120201109");
@@ -51,6 +50,14 @@ public class Genome implements Serializable{
 
     }
 
+    public Gene randomGene(){
+        return (Gene) (genome.values().toArray()[RANDOM.nextInt(genome.size())]);
+    }
+
+    public Node randomNode(){
+        return (Node) (network.values().toArray()[RANDOM.nextInt(network.size())]);
+    }
+
     public void mutateActivation(){
         if(genome.size() <= 0) return;
 
@@ -59,8 +66,17 @@ public class Genome implements Serializable{
         while(activationChance > 0){
 
             if(RANDOM.nextDouble() < activationChance){
-                Gene randomGene = (Gene) (genome.values().toArray()[RANDOM.nextInt(genome.size())]);
-                randomGene.mutateActivation();
+                Node randomNode = randomNode();
+                randomNode.setActivationFunction(Node.ActivationFunction.random());
+
+                for(Gene gene : genome.values()){
+
+                    if(gene.getOutput() == randomNode.getID()){
+                        gene.setActivationFunction(randomNode.getActivationFunction());
+                    }
+
+                }
+
             }
 
             activationChance -= 1;
@@ -180,13 +196,13 @@ public class Genome implements Serializable{
 
         // input + output node generation
         for(int i = 0; i < inputSize + 1; i++){
-            this.network.put(i, new Node(Node.NodeType.INPUT));
+            this.network.put(i, new Node(Node.NodeType.INPUT, i));
         }
 
         this.network.get(inputSize).setOutput(1);
 
         for(int i = 0; i < outputSize; i++){
-            this.network.put(i + inputSize + 1, new Node(Node.NodeType.OUTPUT));
+            this.network.put(i + inputSize + 1, new Node(Node.NodeType.OUTPUT, i));
         }
 
         // connection + hidden node generation
@@ -194,7 +210,7 @@ public class Genome implements Serializable{
             Gene gene = genome.get(i);
 
             if(gene != null && network.get(gene.getOutput()) == null && gene.enabled){
-                network.put(gene.getOutput(), new Node(Node.NodeType.HIDDEN, gene.getActivationFunction()));
+                network.put(gene.getOutput(), new Node(Node.NodeType.HIDDEN, gene.getActivationFunction(), gene.getOutput()));
             }
 
         }
@@ -203,7 +219,7 @@ public class Genome implements Serializable{
             Gene gene = genome.get(i);
 
             if(gene != null && network.get(gene.getInput()) == null && gene.enabled){
-                network.put(gene.getInput(), new Node(Node.NodeType.HIDDEN));
+                network.put(gene.getInput(), new Node(Node.NodeType.HIDDEN, gene.getInput()));
             }
 
         }

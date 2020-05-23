@@ -62,9 +62,11 @@ public class Node implements Serializable{
     private ArrayList<Node> inputs = new ArrayList<Node>();
     private boolean fired = false;
     private double output = 0;
+    private int id = -1;
 
-    public Node(NodeType type){
+    public Node(NodeType type, int id){
         this.type = type;
+        this.id = id;
 
         if(type == NodeType.INPUT){
             this.fired = true;
@@ -72,18 +74,15 @@ public class Node implements Serializable{
 
     }
 
-    public Node(NodeType type, ActivationFunction func){
+    public Node(NodeType type, ActivationFunction func, int id){
         this.type = type;
         this.func = func;
+        this.id = id;
 
         if(type == NodeType.INPUT){
             this.fired = true;
         }
 
-    }
-
-    public void setActivation(ActivationFunction func){
-        this.func = func;
     }
 
     public void addInput(Node node){
@@ -130,7 +129,10 @@ public class Node implements Serializable{
 
     }
 
+    public void setActivationFunction(ActivationFunction func){this.func = func;}
+    public ActivationFunction getActivationFunction(){return func;}
     public NodeType getType(){return type;}
+    public int getID(){return id;}
 
     private static double gaussian(double x){
         return 1.0 / (0.4 * Math.sqrt(2.0 * Math.PI)) * Math.pow(Math.E, -Math.pow(x, 2.0) / (2.0 * Math.pow(0.4, 2.0)));
