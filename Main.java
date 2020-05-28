@@ -23,13 +23,14 @@ public class Main{
 	static final int DEF_SIZE = 1000;
 	static final int DEF_TILES = 200;
 	static final int DEF_COMPLEXITY = 100;
-	static JFrame frame;
+	static final JFrame frame = new JFrame("Canvas");
 
 	static int size = DEF_SIZE;
 	static int numTiles = DEF_TILES;
 	static int complexity = DEF_COMPLEXITY;
 	static boolean animate = false;
 	static boolean minimized = false;
+	static boolean save = false;
 	static String fileName = "pattern";
 	static String loadFile = null;
 
@@ -48,10 +49,10 @@ public class Main{
 		System.out.println("CMPLX: Network complexity (int)");
 		System.out.println("ANIM: If rendering should be animated (true/false)");
 		System.out.println("MIN: If window should never pop up (true/false)");
+		System.out.println("SAVE: If the pattern should be saved to file (true/false)");
 		System.out.println("FILE: Screenshot and network file names (string)");
 		System.out.println("LOAD: Load network file name without extension (string)");
 		ArrayList<String> args = new ArrayList<String>(Arrays.asList(rArgs));
-		args.ensureCapacity(6);
 		args.forEach(obj -> {
 			String str = (String) obj;
 
@@ -102,6 +103,15 @@ public class Main{
 					minimized = false;
 				}
 
+			} else if(str.contains("SAVE=")){
+
+				try{
+					save = Boolean.parseBoolean(str.substring(5, str.length()));
+				} catch(Exception e){
+					System.out.println("Could not read SAVE");
+					save = false;
+				}
+
 			} else if(str.contains("FILE=")){
 
 				try{
@@ -124,7 +134,6 @@ public class Main{
 
 		});
 
-		frame = new JFrame("Canvas");
 		frame.setSize(size, size);
 
 		if(minimized){
@@ -155,7 +164,7 @@ public class Main{
 		}
 
 		if(test == null){
-			test = new Genome(new HashMap<Integer, Gene>(), 2, 3);
+			test = new Genome(new HashMap<Integer, Gene>(), 5, 3);
 			test.compile();
 			
 			for(int i = 0; i < DEF_COMPLEXITY; i++){
@@ -174,21 +183,27 @@ public class Main{
 
 		}
 
-		double maxValR = Double.MIN_VALUE;
+		double maxValR = -Double.MAX_VALUE;
 		double minValR = Double.MAX_VALUE;
 
-		double maxValG = Double.MIN_VALUE;
+		double maxValG = -Double.MAX_VALUE;
 		double minValG = Double.MAX_VALUE;
 
-		double maxValB = Double.MIN_VALUE;
+		double maxValB = -Double.MAX_VALUE;
 		double minValB = Double.MAX_VALUE;
 
 		double[][][] vals = new double[numTiles][numTiles][3];
+		double rawCounter = 0;
 
 		for(int i = 0; i < numTiles; i++){
 
 			for(int j = 0; j < numTiles; j++){
-				double[] state = {2.0 * (double) i / numTiles - 1, 2.0 * (double) j / numTiles - 1};
+				double x = 2.0 * (double) i / numTiles - 1;
+				double y = 2.0 * (double) j / numTiles - 1;
+				double dist = Math.sqrt(x * x + y * y);
+				double theta = Math.asin(y / dist) / Math.PI * 2;
+				double counter = 2.0 * rawCounter / numTiles / numTiles - 1;
+				double[] state = {x, y, dist, theta, counter};
 				vals[i][j] = test.predict(state);
 				
 				if(vals[i][j][0] > maxValR){
@@ -209,6 +224,7 @@ public class Main{
 					minValB = vals[i][j][2];
 				}
 
+				rawCounter++;
 			}
 
 		}
@@ -230,15 +246,18 @@ public class Main{
 			frame.setVisible(true);
 		}
 
-		BufferedImage img = getScreenShot(frame.getContentPane());
+		if(save){
+			BufferedImage img = getScreenShot(frame.getContentPane());
 
-		try{
-			ImageIO.write(img, "png", new File("patterns/" + fileName + ".png"));
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("patterns/" + fileName + ".gen"));
-			oos.writeObject(test);
-			oos.close();
-		} catch(Exception e){
-			e.printStackTrace();
+			try{
+				ImageIO.write(img, "png", new File("patterns/" + fileName + ".png"));
+				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("patterns/" + fileName + ".gen"));
+				oos.writeObject(test);
+				oos.close();
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+
 		}
 
 		if(minimized){

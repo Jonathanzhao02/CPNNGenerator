@@ -18,7 +18,6 @@ public class Node implements Serializable{
         BOUNDED_LINEAR(Node::boundedLinear),
         RELU(Node::relu),
         MODULUS(Node::modulus),
-        INVERSE_MODULUS(Node::inverseModulus),
         ABSOLUTE_VALUE(Node::absoluteValue),
         INVERSE_ABSOLUTE_VALUE(Node::inverseAbsoluteValue),
         LINEAR(Node::linear),
@@ -27,8 +26,7 @@ public class Node implements Serializable{
         CUBIC(Node::cubic),
         LOG(Node::log),
         EXPONENTIAL(Node::exponential),
-        ALTERNATING_FLOOR(Node::alternatingFloor),
-        INVERSE_ALTERNATING_FLOOR(Node::inverseAlternatingFloor);
+        ALTERNATING_FLOOR(Node::alternatingFloor);
 
         private static final Random RANDOM = new Random();
         private static final List<ActivationFunction> VALUES = Arrays.asList(ActivationFunction.values());
@@ -178,10 +176,6 @@ public class Node implements Serializable{
         return x % 1.0;
     }
 
-    private static double inverseModulus(double x){
-        return 1.0 - x % 1.0;
-    }
-
     private static double linear(double x){
         return x;
     }
@@ -203,11 +197,11 @@ public class Node implements Serializable{
     }
 
     private static double parabolic(double x){
-        return Math.pow(x, 2.0);
+        return Math.pow(Math.abs(x) % 1.0, 2);
     }
 
     private static double cubic(double x){
-        return Math.pow(x, 3.0);
+        return Math.pow((x + 1) % 2.0 - 1, 3);
     }
 
     private static double log(double x){
@@ -223,15 +217,11 @@ public class Node implements Serializable{
     }
 
     private static double exponential(double x){
-        return Math.pow(2, x - 1);
+        return Math.pow(2, (x + 1) % 2.0 - 2);
     }
 
     private static double alternatingFloor(double x){
         return Math.floor(x) % 2.0;
-    }
-
-    private static double inverseAlternatingFloor(double x){
-        return 1 - Math.floor(x) % 2.0;
     }
 
 }

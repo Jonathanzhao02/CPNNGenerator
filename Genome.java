@@ -256,4 +256,14 @@ public class Genome implements Serializable{
         return outputs;
     }
 
+    public void printGenome(){
+
+        for(Gene gene : genome.values()){
+            System.out.println("\n" + gene.getInput() + " -> " + gene.getOutput());
+            System.out.println(gene.getActivationFunction());
+            System.out.println(gene.getWeight());
+        }
+
+    }
+
 }
