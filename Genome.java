@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 public class Genome implements Serializable{
-    static final long serialVersionUID = Long.parseLong("52120201109");
+    public static final long serialVersionUID = Long.parseLong("52120201109");
 
     private static int GLOBAL_INNOVATION_NUMBER = 0;
     private static HashSet<Gene> MUTATIONS = new HashSet<Gene>();

@@ -137,7 +137,7 @@ public class Main{
 		frame.setSize(size, size);
 
 		if(minimized){
-			frame.setState(frame.ICONIFIED);
+			frame.setState(JFrame.ICONIFIED);
 		}
 
 		if(animate){
@@ -269,6 +269,7 @@ public class Main{
 }
 
 class JCanvas extends JPanel{
+	public static final long serialVersionUID = 10483782;
 	private int size;
 	private int r;
 	private int g;
