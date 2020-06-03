@@ -197,8 +197,8 @@ public class Main{
 		for(int i = 0; i < numTiles; i++){
 
 			for(int j = 0; j < numTiles; j++){
-				double x = 2.0 * (double) i / numTiles - 1;
-				double y = 2.0 * (double) j / numTiles - 1;
+				double x = 2.0 * (double) i / (numTiles - 1) - 1;
+				double y = 2.0 * (double) j / (numTiles - 1) - 1;
 				double dist = Math.sqrt(x * x + y * y);
 				double theta = Math.asin(y / dist) / Math.PI * 2;
 				double counter = 2.0 * rawCounter / numTiles / numTiles - 1;
@@ -252,9 +252,13 @@ public class Main{
 
 			try{
 				ImageIO.write(img, "png", new File("patterns/" + fileName + ".png"));
-				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("patterns/" + fileName + ".gen"));
-				oos.writeObject(test);
-				oos.close();
+
+				if(loadFile == null){
+					ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("patterns/" + fileName + ".gen"));
+					oos.writeObject(test);
+					oos.close();
+				}
+
 			} catch(Exception e){
 				e.printStackTrace();
 			}

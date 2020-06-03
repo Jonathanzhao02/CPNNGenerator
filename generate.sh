@@ -6,4 +6,4 @@ do
 	java Main FILE=$i ANIM=false MIN=true SAVE=true
 done
 
-enhance.sh
+bash enhance.sh
