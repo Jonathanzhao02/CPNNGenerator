@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -20,12 +19,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Main{
-	static final int DEF_SIZE = 1000;
+	static final int DEF_RESOLUTION = 800;
 	static final int DEF_TILES = 200;
 	static final int DEF_COMPLEXITY = 100;
 	static final JFrame frame = new JFrame("Canvas");
 
-	static int size = DEF_SIZE;
+	static int resolution = DEF_RESOLUTION;
 	static int numTiles = DEF_TILES;
 	static int complexity = DEF_COMPLEXITY;
 	static boolean animate = false;
@@ -44,8 +43,8 @@ public class Main{
 	public static void main(String[] rArgs){
 		System.out.println("Please type in arguments as (ARG NAME)=(ARG VALUE)");
 		System.out.println("Args descriptions:");
-		System.out.println("RES: Total resolution (int)");
-		System.out.println("TILES: How many tiles to render (int)");
+		System.out.println("RES: How much pixel resolution per side (int)");
+		System.out.println("TILES: How many tiles per side (int)");
 		System.out.println("CMPLX: Network complexity (int)");
 		System.out.println("ANIM: If rendering should be animated (true/false)");
 		System.out.println("MIN: If window should never pop up (true/false)");
@@ -61,10 +60,10 @@ public class Main{
 			} else if(str.contains("RES=")){
 				
 				try{
-					size = Integer.parseInt(str.substring(4, str.length()));
+					resolution = Integer.parseInt(str.substring(4, str.length()));
 				} catch(Exception e){
 					System.out.println("Could not read RES");
-					size = DEF_SIZE;
+					resolution = DEF_RESOLUTION;
 				}
 
 			} else if(str.contains("TILES=")){
@@ -134,7 +133,7 @@ public class Main{
 
 		});
 
-		frame.setSize(size, size);
+		frame.setSize(resolution, resolution);
 
 		if(minimized){
 			frame.setState(JFrame.ICONIFIED);
@@ -145,7 +144,6 @@ public class Main{
 		}
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new GridLayout(numTiles, numTiles));
 
 		Genome test = null;
 
@@ -158,7 +156,8 @@ public class Main{
 				ois.close();
 			} catch(Exception e){
 				e.printStackTrace();
-				test = null;
+				System.out.println("\nExiting to avoid possible overwrite...");
+				System.exit(0);
 			}
 
 		}
@@ -229,24 +228,26 @@ public class Main{
 
 		}
 
+		int[][][] colorVals = new int[numTiles][numTiles][3];
+
 		for(int i = 0; i < numTiles; i++){
 
 			for(int j = 0; j < numTiles; j++){
-				int r = (int) (254.0 * (vals[i][j][0] - minValR) / (maxValR - minValR));
-				int g = (int) (254.0 * (vals[i][j][1] - minValG) / (maxValG - minValG));
-				int b = (int) (254.0 * (vals[i][j][2] - minValB) / (maxValB - minValB));
-				frame.getContentPane().add(new JCanvas(size / numTiles, r, g, b));
+				colorVals[i][j][0] = (int) (254.0 * (vals[i][j][0] - minValR) / (maxValR - minValR));
+				colorVals[i][j][1] = (int) (254.0 * (vals[i][j][1] - minValG) / (maxValG - minValG));
+				colorVals[i][j][2] = (int) (254.0 * (vals[i][j][2] - minValB) / (maxValB - minValB));
 			}
 
 		}
 
+		frame.add(new JCanvas(resolution, numTiles, colorVals));
 		frame.validate();
 
 		if(!animate){
 			frame.setVisible(true);
 		}
 
-		if(save){
+		if(save || !fileName.equals("pattern")){
 			BufferedImage img = getScreenShot(frame.getContentPane());
 
 			try{
@@ -270,27 +271,31 @@ public class Main{
 
 class JCanvas extends JPanel{
 	public static final long serialVersionUID = 10483782;
-	private int size;
-	private int r;
-	private int g;
-	private int b;
+	private int resolution;
+	private int numTiles;
+	private int[][][] colorVals;
 
-	public JCanvas(int size, int r, int g, int b){
-		this.size = size;
-		this.r = Math.min(254, r);
-		this.r = Math.max(0, this.r);
-		this.g = Math.min(254, g);
-		this.g = Math.max(0, this.g);
-		this.b = Math.min(254, b);
-		this.b = Math.max(0, this.b);
-		setPreferredSize(new Dimension(size, size));
+	public JCanvas(int resolution, int numTiles, int[][][] colorVals){
+		this.resolution = resolution;
+		this.numTiles = numTiles;
+		this.colorVals = colorVals;
+		setPreferredSize(new Dimension(resolution, resolution));
 	}
 
 	@Override
 	public void paint(Graphics gr){
 		Graphics2D g2 = (Graphics2D) gr;
-		g2.setColor(new Color(r, g, b));
-		g2.fillRect(0, 0, size, size);
+		int size = resolution / numTiles;
+
+		for(int i = 0; i < numTiles; i++){
+
+			for(int j = 0; j < numTiles; j++){
+				g2.setColor(new Color(colorVals[i][j][0], colorVals[i][j][1], colorVals[i][j][2]));
+				g2.fillRect(i * size, j * size, size, size);
+			}
+
+		}
+
 	}
 	
 }
