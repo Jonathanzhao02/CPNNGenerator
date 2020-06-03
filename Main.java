@@ -163,7 +163,7 @@ public class Main{
 		}
 
 		if(test == null){
-			test = new Genome(new HashMap<Integer, Gene>(), 5, 3);
+			test = new Genome(new HashMap<Integer, Gene>(), 4, 3);
 			test.compile();
 			
 			for(int i = 0; i < DEF_COMPLEXITY; i++){
@@ -202,7 +202,7 @@ public class Main{
 				double dist = Math.sqrt(x * x + y * y);
 				double theta = Math.asin(y / dist) / Math.PI * 2;
 				double counter = 2.0 * rawCounter / numTiles / numTiles - 1;
-				double[] state = {x, y, dist, theta, counter};
+				double[] state = {x, y, dist, theta};
 				vals[i][j] = test.predict(state);
 				
 				if(vals[i][j][0] > maxValR){
@@ -233,9 +233,9 @@ public class Main{
 		for(int i = 0; i < numTiles; i++){
 
 			for(int j = 0; j < numTiles; j++){
-				colorVals[i][j][0] = (int) (254.0 * (vals[i][j][0] - minValR) / (maxValR - minValR));
-				colorVals[i][j][1] = (int) (254.0 * (vals[i][j][1] - minValG) / (maxValG - minValG));
-				colorVals[i][j][2] = (int) (254.0 * (vals[i][j][2] - minValB) / (maxValB - minValB));
+				colorVals[i][j][0] = minMax(0, 254, (int) (254.0 * (vals[i][j][0] - minValR) / (maxValR - minValR)));
+				colorVals[i][j][1] = minMax(0, 254, (int) (254.0 * (vals[i][j][1] - minValG) / (maxValG - minValG)));
+				colorVals[i][j][2] = minMax(0, 254, (int) (254.0 * (vals[i][j][2] - minValB) / (maxValB - minValB)));
 			}
 
 		}
@@ -263,6 +263,18 @@ public class Main{
 
 		if(minimized){
 			System.exit(0);
+		}
+
+	}
+
+	private static int minMax(int min, int max, int val){
+
+		if(val < min){
+			return min;
+		} else if(val > max){
+			return max;
+		} else{
+			return val;
 		}
 
 	}
