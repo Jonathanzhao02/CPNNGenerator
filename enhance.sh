@@ -1,5 +1,4 @@
 #!/bin/bash
-javac *.java
 
 for i in {1..100}
 do
