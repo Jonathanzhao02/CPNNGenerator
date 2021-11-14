@@ -1,9 +1,10 @@
 #!/bin/bash
+mkdir patterns
 javac *.java
 
-for i in {1..100}
+for i in $(eval echo {1..$1})
 do
 	java Main FILE=$i ANIM=false MIN=true SAVE=true
 done
 
-bash enhance.sh
+./enhance.sh $1
