@@ -28,7 +28,7 @@ public class Main{
 	static final int DEF_RESOLUTION = 800;
 	static final int DEF_TILES = 200;
 	static final int DEF_COMPLEXITY = 100;
-	static final JFrame frame = new JFrame("Canvas");
+	static JFrame frame = null;
 
 	static int resolution = DEF_RESOLUTION;
 	static int numTiles = DEF_TILES;
@@ -63,18 +63,19 @@ public class Main{
 			parseString((String) obj);
 		});
 
-		// sets frame properties
-		frame.setSize(resolution, resolution);
+        if (animate) {
+            frame = new JFrame("Canvas");
 
-		if(minimized){
-			frame.setState(JFrame.ICONIFIED);
-		}
+            // sets frame properties
+            frame.setSize(resolution, resolution);
 
-		if(animate){
-			frame.setVisible(true);
-		}
+            if(minimized){
+                frame.setState(JFrame.ICONIFIED);
+            }
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
 
 		Genome genome = createGenome();
 
@@ -140,17 +141,30 @@ public class Main{
 
 		}
 
-		// graphically shows neural network outputs
-		frame.add(new JCanvas(resolution, numTiles, colorVals));
-		frame.validate();
-
-		if(!animate){
-			frame.setVisible(true);
-		}
+        if (animate) {
+            // graphically shows neural network outputs
+            frame.add(new JCanvas(resolution, numTiles, colorVals));
+            frame.validate();
+            frame.setVisible(true);
+        }
 
 		// saves genome and image if user requested to do so
 		if(save || !fileName.equals("pattern")){
-			BufferedImage img = getScreenShot(frame.getContentPane());
+			BufferedImage img = null;
+
+            if (animate) {
+                img = getScreenShot(frame.getContentPane());
+            } else {
+                img = new BufferedImage(numTiles, numTiles, BufferedImage.TYPE_INT_RGB);
+
+                for (int i = 0; i < numTiles; i++) {
+                    for (int j = 0; j < numTiles; j++) {
+                        int[] color = colorVals[i][j];
+                        int rgb = (color[0] << 0) + (color[1] << 8) + (color[2] << 16);
+                        img.setRGB(j, i, rgb);
+                    }
+                }
+            }
 
 			try{
 				ImageIO.write(img, "png", new File("patterns/" + fileName + ".png"));
